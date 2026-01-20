@@ -6,6 +6,7 @@ import DashboardAdmin from "./pages/Admin/DashboardAdmin"
 import DashboardFarmer from "./pages/Farmer/DashboardFarmer";
 import ProfileFarmer from "./pages/Farmer/ProfileFarmer";
 import FarmerRegister from "./pages/Farmer/FarmerRegister";
+import { Toaster } from "react-hot-toast";
 
 
 const router = createBrowserRouter([
@@ -39,6 +40,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
+      <Toaster />
     </>
   )
 }

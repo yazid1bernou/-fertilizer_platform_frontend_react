@@ -1,10 +1,66 @@
-
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const Login = () => {
 
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState("")
+
+    const navigate = useNavigate()
+
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+
+        try {
+            const res = await axios.post('http://localhost:8000/api/login',
+                {
+                    email,
+                    password
+                }
+            )
+            const { token, role } = res.data
+            localStorage.setItem("token", token)
+            localStorage.setItem("role", role)
+
+            redirectByRole(role)
+            toast.success("تم تسجيل الدخول بنجاح")
+        }
+        catch (err) {
+            toast.error(err.response?.data?.message || "خطأ في تسجيل الدخول");
+            console.log(err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+
+    const redirectByRole = (role) => {
+        switch (role) {
+            case "admin":
+                navigate("/admin/dashboard")
+                break
+            case "directorate":
+                navigate("/directorate/dashboard");
+                break;
+            case "supplier":
+                navigate("/supplier/dashboard");
+                break;
+            case "farmer":
+                navigate("/farmer/dashboard");
+                break;
+            default:
+                navigate("/");
+
+
+        }
+    }
     return (
 
-        <div classNameName="bg-background-light dark:bg-background-dark font-display">
+        <div className="bg-background-light dark:bg-background-dark font-display">
             <div className="flex h-screen w-full overflow-hidden">
                 {/*  <!-- Left Panel: Branding & Imagery --> */}
                 <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 text-white overflow-hidden">
@@ -58,14 +114,18 @@ const Login = () => {
                             <p className="text-[#6a8173] dark:text-[#a1b3a8] text-lg font-extrabold">الرجاء إدخال بياناتك للوصول إلى حسابك وإدارة
                                 طلباتك.</p>
                         </div>
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={handleLoginSubmit}>
                             {/*    <!-- Email Field --> */}
                             <div className="flex flex-col gap-2">
                                 <label className="text-[#121614] dark:text-white text-base font-extrabold">البريد الإلكتروني</label>
                                 <div className="relative group">
                                     <input
                                         className="form-input w-full rounded-xl text-[#121614] dark:text-white border-[#dde3e0] dark:border-[#3a443e] bg-white dark:bg-[#2d2d32] focus:border-primary focus:ring-1 focus:ring-primary h-14 px-4 text-base transition-all placeholder:text-[#6a8173]/50"
-                                        placeholder="example@domain.dz" type="email" />
+                                        placeholder="example@domain.dz"
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
                                     <span
                                         className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#6a8173]">mail</span>
                                 </div>
@@ -76,10 +136,14 @@ const Login = () => {
                                 <div className="relative group">
                                     <input
                                         className="form-input w-full rounded-xl text-[#121614] dark:text-white border-[#dde3e0] dark:border-[#3a443e] bg-white dark:bg-[#2d2d32] focus:border-primary focus:ring-1 focus:ring-primary h-14 px-4 text-base transition-all placeholder:text-[#6a8173]/50"
-                                        placeholder="********" type="password" />
+                                        placeholder="********"
+                                        type="password"
+
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
                                     <button
                                         className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a8173] hover:text-primary transition-colors"
-                                        type="button">
+                                        type="submit">
                                         <span className="material-symbols-outlined">visibility</span>
                                     </button>
                                 </div>
